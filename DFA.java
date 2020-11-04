@@ -175,11 +175,11 @@ class DFAClass {
 			for (Object A : wArr) {
 				W.remove(A);
 				for (char input : validInputs) {
-					Set<Integer> X = findX((Set)A, input);
+					Set<Integer> X = findX((Set<Integer>)A, input);
 
 					for (Object Y : pArr) {
-						Set<Integer> xAndY = intersection(X, (Set)Y);
-						Set<Integer> yNotX = setSubtraction((Set)Y, X);
+						Set<Integer> xAndY = intersection(X, (Set<Integer>)Y);
+						Set<Integer> yNotX = setSubtraction((Set<Integer>)Y, X);
 						if (!xAndY.isEmpty() && !yNotX.isEmpty()) {
 							P.remove(Y);
 							P.add(xAndY);
