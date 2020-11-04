@@ -3,33 +3,33 @@ import java.io.*;
 
 class DFA {
   public static void main(String[] args) {
-		DFAParser parser = new DFAParser();
-		DFA minDFA = parser.parseFile(args[0]).hopcroftMinimization();
-		minDFA.print();
-		minDFA.printInputResults(args[1]);
+		DFAClassParser parser = new DFAClassParser();
+		DFAClass minDFAClass = parser.parseFile(args[0]).hopcroftMinimization();
+		minDFAClass.print();
+		minDFAClass.printInputResults(args[1]);
   }
 }
 
-class DFAParser {
-	public DFA parseFile(String filename) {
-		return buildDFA(getLines(filename));
+class DFAClassParser {
+	public DFAClass parseFile(String filename) {
+		return buildDFAClass(getLines(filename));
 	}
 
-	public DFA buildDFA(ArrayList<String> inputLines) {
-		DFA dfa = new DFA();
+	public DFAClass buildDFAClass(ArrayList<String> inputLines) {
+		DFAClass DFAClass = new DFAClass();
 
 		String[] validInputs = inputLines.get(1).split(":")[1].trim().replaceAll(" +", " ").split(" ");
 
 		for (String input : validInputs) {
-			dfa.addInput(input.charAt(0));
+			DFAClass.addInput(input.charAt(0));
 		}
 
 		String initialState = inputLines.get(inputLines.size() - 2).split(":")[0];
-		dfa.initial = Integer.parseInt(initialState);
+		DFAClass.initial = Integer.parseInt(initialState);
 		String[] acceptingStates = inputLines.get(inputLines.size() - 1).split(":")[0].split(",");
 		
 		for (String state : acceptingStates) {
-			dfa.addState(Integer.parseInt(state), true);
+			DFAClass.addState(Integer.parseInt(state), true);
 		}
 
 		inputLines.remove(inputLines.size() - 1);
@@ -42,16 +42,16 @@ class DFAParser {
 		for (String line : inputLines) {
 			line = line.trim().replaceAll(" +", " ").replace(":","");
 			String[] stateMapping = line.split(" ");
-			dfa.addState(Integer.parseInt(stateMapping[0]), false);
+			DFAClass.addState(Integer.parseInt(stateMapping[0]), false);
 
-			for (int i = 1; i < dfa.validInputs.size() + 1; i++) {
-				dfa.addTransition(Integer.parseInt(stateMapping[0]), 
+			for (int i = 1; i < DFAClass.validInputs.size() + 1; i++) {
+				DFAClass.addTransition(Integer.parseInt(stateMapping[0]), 
 				validInputs[i-1].charAt(0), 
 				Integer.parseInt(stateMapping[i]));
 			}
 		}
 	
-		return dfa;
+		return DFAClass;
 	}
 
 	public ArrayList<String> getLines(String filename) {
@@ -101,7 +101,7 @@ class TransitionMap {
 	}
 }
 
-class DFA {
+class DFAClass {
 	Set<Integer> accepting = new HashSet<>();
 	Set<Integer> states = new HashSet<>();
 	int initial;
@@ -132,16 +132,16 @@ class DFA {
 		return map.map.get(fromState).get(input);
 	}
 
-	public DFA minStatesToDFA(Set<Set<Integer>> P) {
-		DFA dfa = new DFA();
-		dfa.validInputs.addAll(validInputs);
+	public DFAClass minStatesToDFAClass(Set<Set<Integer>> P) {
+		DFAClass DFAClass = new DFAClass();
+		DFAClass.validInputs.addAll(validInputs);
 
 		Object[] pArr = P.toArray();
 		for (int i = 0; i < pArr.length; i++) {
 			if(!Collections.disjoint(accepting, (Set<Integer>)pArr[i])) {
-				dfa.addState(i, true);
+				DFAClass.addState(i, true);
 			} else {
-				dfa.addState(i, false);
+				DFAClass.addState(i, false);
 			}
 		}
 
@@ -151,17 +151,17 @@ class DFA {
 					int toOldState = map.map.get(oldState).get(input);
 					for (int j = 0; j < pArr.length; j++) {
 						if (((Set<Integer>)pArr[j]).contains(toOldState)) {
-							dfa.addTransition(i, input, j);
+							DFAClass.addTransition(i, input, j);
 						}
 					}
 				}
 			}
 		}
 
-		return dfa;
+		return DFAClass;
 	}
 
-	public DFA hopcroftMinimization() {
+	public DFAClass hopcroftMinimization() {
 		Set<Set<Integer>> P = new HashSet<>();
 		Set<Set<Integer>> W = new HashSet<>();
 		P.add(new HashSet<Integer>(accepting));
@@ -202,7 +202,7 @@ class DFA {
 			}
 		}
 
-		return minStatesToDFA(P);
+		return minStatesToDFAClass(P);
 	}
 
 	public void print() {
